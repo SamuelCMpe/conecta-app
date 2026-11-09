@@ -63,13 +63,19 @@ class SupabaseRepository implements AppRepository {
   }
 
   @override
-  Future<Profile> redeemQrToken(String token) async {
+  Future<Profile> redeemQrToken(String token, {MeetPlace? place}) async {
     try {
-      final res = await _db.rpc('redeem_qr_token', params: {'p_token': token});
+      final res = await _db.rpc('redeem_qr_token', params: {
+        'p_token': token,
+        'p_place': place?.name ?? '',
+        'p_lat': place?.lat,
+        'p_lng': place?.lng,
+      });
       return Profile.fromRow((res as Map).cast<String, dynamic>());
     } on PostgrestException catch (e) {
       if (e.message.contains('expired')) throw QrExpiredException();
       if (e.message.contains('own')) throw OwnQrException();
+      if (e.message.contains('blocked')) throw Exception('No puedes conectar con esta persona.');
       rethrow;
     }
   }
@@ -84,29 +90,63 @@ class SupabaseRepository implements AppRepository {
         relation: m['relation'] as String,
         since: DateTime.parse(m['since'] as String).toLocal(),
         revoked: m['revoked'] as bool? ?? false,
+        place: m['place'] as String? ?? '',
+        lat: (m['lat'] as num?)?.toDouble(),
+        lng: (m['lng'] as num?)?.toDouble(),
+        selfieUrl: m['selfie_url'] as String?,
+        note: m['note'] as String? ?? '',
       );
     }).toList();
-  }
-
-  @override
-  Future<List<ContactRequest>> loadRequests() async {
-    final rows = await _db.rpc('my_requests') as List;
-    return rows.map((r) {
-      final m = (r as Map).cast<String, dynamic>();
-      return ContactRequest(
-        from: Profile.fromRow((m['profile'] as Map).cast<String, dynamic>()),
-        at: DateTime.parse(m['at'] as String).toLocal(),
-      );
-    }).toList();
-  }
-
-  @override
-  Future<void> respondToRequest(String fromUserId, {required bool accept}) async {
-    await _db.rpc('respond_request', params: {'p_from': fromUserId, 'p_accept': accept});
   }
 
   @override
   Future<void> setAccessRevoked(String contactUserId, bool revoked) async {
     await _db.rpc('set_access_revoked', params: {'p_viewer': contactUserId, 'p_revoked': revoked});
   }
+
+  @override
+  Future<void> saveNote(String contactUserId, String note) =>
+      _db.rpc('save_note', params: {'p_about': contactUserId, 'p_note': note});
+
+  @override
+  Future<void> saveSelfie(String contactUserId, String url) =>
+      _db.rpc('save_meet', params: {'p_other': contactUserId, 'p_selfie_url': url});
+
+  @override
+  Future<void> savePlace(String contactUserId, String place) =>
+      _db.rpc('save_meet', params: {'p_other': contactUserId, 'p_place': place});
+
+  @override
+  Future<void> setVisible(MeetPlace? place) => _db.rpc('set_visible', params: {
+        'p_place': place?.name ?? '',
+        'p_lat': place?.lat,
+        'p_lng': place?.lng,
+      });
+
+  @override
+  Future<List<NearbyPerson>> loadNearby(MeetPlace place) async {
+    if (!place.hasCoords) return const [];
+    final rows = await _db.rpc('nearby', params: {'p_lat': place.lat, 'p_lng': place.lng}) as List;
+    return rows.map((r) {
+      final m = (r as Map).cast<String, dynamic>();
+      return NearbyPerson(
+        id: m['id'] as String,
+        firstName: m['first_name'] as String? ?? '',
+        avatarUrl: m['avatar_url'] as String?,
+        sticker: m['sticker'] as String? ?? '',
+        wavedAtMe: m['waved_at_me'] as bool? ?? false,
+        iWaved: m['i_waved'] as bool? ?? false,
+      );
+    }).toList();
+  }
+
+  @override
+  Future<void> sendWave(String userId) => _db.rpc('send_wave', params: {'p_to': userId});
+
+  @override
+  Future<void> block(String userId) => _db.rpc('block_user', params: {'p_id': userId});
+
+  @override
+  Future<void> report(String userId, String reason) =>
+      _db.rpc('report_user', params: {'p_id': userId, 'p_reason': reason});
 }

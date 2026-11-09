@@ -1,13 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'dart:ui';
 
-import '../state/app_state.dart';
-import 'contacts_screen.dart';
+import 'package:flutter/material.dart';
+
+import '../theme/polaroid.dart';
 import 'my_profile_screen.dart';
 import 'scanner_screen.dart';
 import 'settings_screen.dart';
+import 'wall_screen.dart';
 
-/// Pantalla principal con la barra de abajo.
+/// Pantalla principal con la barra flotante de abajo.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
   @override
@@ -19,33 +20,61 @@ class HomeShellState extends State<HomeShell> {
 
   void goTo(int tab) => setState(() => _tab = tab);
 
+  static const _items = [
+    (Icons.home_outlined, Icons.home_rounded, 'Perfil'),
+    (Icons.qr_code_scanner, Icons.qr_code_scanner, 'Escanear'),
+    (Icons.photo_library_outlined, Icons.photo_library_rounded, 'Mi muro'),
+    (Icons.tune, Icons.tune, 'Ajustes'),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final requests = context.watch<AppState>().requests.length;
     final pages = [
       const MyProfileScreen(),
       ScannerScreen(active: _tab == 1),
-      const ContactsScreen(),
+      const WallScreen(),
       const SettingsScreen(),
     ];
     return Scaffold(
+      backgroundColor: Pal.bg,
       extendBody: true,
       body: IndexedStack(index: _tab, children: pages),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: goTo,
-        destinations: [
-          const NavigationDestination(
-              icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Perfil'),
-          const NavigationDestination(icon: Icon(Icons.qr_code_scanner), label: 'Escanear'),
-          NavigationDestination(
-            icon:
-                Badge(isLabelVisible: requests > 0, label: Text('$requests'), child: const Icon(Icons.people_outline)),
-            selectedIcon: const Icon(Icons.people),
-            label: 'Contactos',
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              height: 66,
+              decoration: BoxDecoration(
+                color: const Color(0xB31E1B23),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: Pal.line),
+              ),
+              child: Row(children: [
+                for (var i = 0; i < _items.length; i++)
+                  Expanded(
+                    child: Semantics(
+                      selected: i == _tab,
+                      button: true,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(18),
+                        onTap: () => goTo(i),
+                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(i == _tab ? _items[i].$2 : _items[i].$1,
+                              color: i == _tab ? Pal.yellow : Pal.muted, size: 24),
+                          const SizedBox(height: 3),
+                          Text(_items[i].$3,
+                              style: body(11, color: i == _tab ? Pal.yellow : Pal.muted, weight: FontWeight.w600)),
+                        ]),
+                      ),
+                    ),
+                  ),
+              ]),
+            ),
           ),
-          const NavigationDestination(icon: Icon(Icons.tune), label: 'Ajustes'),
-        ],
+        ),
       ),
     );
   }

@@ -26,6 +26,15 @@ class ProfileStyle {
   /// índice en kQrStyles
   final int qrStyle;
 
+  /// Stickers de la polaroid (máx. 3), ej: ['📍 Máncora', 'aquí de paso 🌊']
+  final List<String> stickers;
+
+  /// Índice en kFrameColors (color del marco de la polaroid)
+  final int frame;
+
+  /// Fondo de "Mi muro": 'corcho' | 'ladrillo' | 'neon' | 'liso'
+  final String wall;
+
   const ProfileStyle({
     this.background = 'montanas',
     this.customBackgroundUrl,
@@ -37,6 +46,9 @@ class ProfileStyle {
     this.buttons = 'vidrio',
     this.accent,
     this.qrStyle = 1,
+    this.stickers = const [],
+    this.frame = 0,
+    this.wall = 'liso',
   });
 
   ProfileStyle copyWith({
@@ -51,6 +63,9 @@ class ProfileStyle {
     int? accent,
     bool clearAccent = false,
     int? qrStyle,
+    List<String>? stickers,
+    int? frame,
+    String? wall,
   }) {
     return ProfileStyle(
       background: background ?? this.background,
@@ -63,6 +78,9 @@ class ProfileStyle {
       buttons: buttons ?? this.buttons,
       accent: clearAccent ? null : (accent ?? this.accent),
       qrStyle: qrStyle ?? this.qrStyle,
+      stickers: stickers ?? this.stickers,
+      frame: frame ?? this.frame,
+      wall: wall ?? this.wall,
     );
   }
 
@@ -77,6 +95,9 @@ class ProfileStyle {
         'buttons': buttons,
         'accent': accent,
         'qrStyle': qrStyle,
+        'stickers': stickers,
+        'frame': frame,
+        'wall': wall,
       };
 
   factory ProfileStyle.fromJson(Map<String, dynamic>? j) {
@@ -92,6 +113,9 @@ class ProfileStyle {
       buttons: j['buttons'] as String? ?? 'vidrio',
       accent: (j['accent'] as num?)?.toInt(),
       qrStyle: (j['qrStyle'] as num?)?.toInt() ?? 1,
+      stickers: (j['stickers'] as List?)?.cast<String>() ?? const [],
+      frame: (j['frame'] as num?)?.toInt() ?? 0,
+      wall: j['wall'] as String? ?? 'liso',
     );
   }
 }
@@ -205,26 +229,86 @@ class Profile {
   }
 }
 
-/// Una persona en "Mis contactos".
+/// Dónde se conocieron (lo pone la app al escanear, o la persona a mano).
+class MeetPlace {
+  final String name;
+  final double? lat;
+  final double? lng;
+  const MeetPlace(this.name, {this.lat, this.lng});
+  bool get hasCoords => lat != null && lng != null;
+}
+
+/// Una persona en "Mi muro".
 class Contact {
   final Profile profile;
 
   /// 'escaneaste' | 'te_escaneo' | 'mutuo'
   final String relation;
+
+  /// Cuándo se conocieron.
   final DateTime since;
 
   /// true si le quitaste el acceso a tu perfil
   final bool revoked;
 
-  const Contact({required this.profile, required this.relation, required this.since, this.revoked = false});
+  /// Barrio o lugar donde se conocieron (puede faltar).
+  final String place;
+  final double? lat;
+  final double? lng;
 
-  Contact copyWith({bool? revoked}) =>
-      Contact(profile: profile, relation: relation, since: since, revoked: revoked ?? this.revoked);
+  /// Foto que se tomaron juntos (la ven los dos).
+  final String? selfieUrl;
+
+  /// Nota privada que solo ve quien la escribió.
+  final String note;
+
+  const Contact({
+    required this.profile,
+    required this.relation,
+    required this.since,
+    this.revoked = false,
+    this.place = '',
+    this.lat,
+    this.lng,
+    this.selfieUrl,
+    this.note = '',
+  });
+
+  Contact copyWith({bool? revoked, String? selfieUrl, String? note, String? place}) => Contact(
+        profile: profile,
+        relation: relation,
+        since: since,
+        revoked: revoked ?? this.revoked,
+        place: place ?? this.place,
+        lat: lat,
+        lng: lng,
+        selfieUrl: selfieUrl ?? this.selfieUrl,
+        note: note ?? this.note,
+      );
 }
 
-/// Alguien que escaneó tu QR y te envió su perfil; tú decides si lo aceptas.
-class ContactRequest {
-  final Profile from;
-  final DateTime at;
-  const ContactRequest({required this.from, required this.at});
+/// Alguien con "Visible" activado cerca de ti. Solo nombre, foto y un sticker: sus redes no.
+class NearbyPerson {
+  final String id;
+  final String firstName;
+  final String? avatarUrl;
+  final String sticker;
+  final bool wavedAtMe;
+  final bool iWaved;
+  const NearbyPerson({
+    required this.id,
+    required this.firstName,
+    this.avatarUrl,
+    this.sticker = '',
+    this.wavedAtMe = false,
+    this.iWaved = false,
+  });
+
+  NearbyPerson copyWith({bool? iWaved}) => NearbyPerson(
+      id: id,
+      firstName: firstName,
+      avatarUrl: avatarUrl,
+      sticker: sticker,
+      wavedAtMe: wavedAtMe,
+      iWaved: iWaved ?? this.iWaved);
 }

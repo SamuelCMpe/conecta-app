@@ -1,101 +1,96 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../state/app_state.dart';
-import '../widgets/common.dart';
+import '../theme/polaroid.dart';
 
+/// Bienvenida: polaroids de gente conectando y el botón para entrar.
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
+  void _login(BuildContext context, {required bool newAccount}) => showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Pal.card,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+        builder: (_) => _LoginSheet(newAccount: newAccount),
+      );
+
   @override
   Widget build(BuildContext context) {
-    final title =
-        GoogleFonts.spaceGrotesk(fontSize: 40, fontWeight: FontWeight.w700, color: Colors.white, height: 1.05);
-    Widget feature(IconData icon, String text) => Padding(
-          padding: const EdgeInsets.only(bottom: 14),
-          child: Row(children: [
-            Icon(icon, color: const Color(0xFFC1B8FF)),
-            const SizedBox(width: 12),
-            Expanded(child: Text(text, style: const TextStyle(color: Color(0xFFE4E5EC), fontSize: 15))),
-          ]),
-        );
-
     return Scaffold(
-      body: Stack(fit: StackFit.expand, children: [
-        Image.asset('assets/backgrounds/bokeh.jpg', fit: BoxFit.cover),
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0x8C0A0619), Color(0xE00A0619)],
-            ),
-          ),
-        ),
-        SafeArea(
-          child: LayoutBuilder(
-            builder: (context, box) => SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: box.maxHeight - 48),
-                child: IntrinsicHeight(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Row(children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration:
-                            BoxDecoration(color: const Color(0xFF4B3BEF), borderRadius: BorderRadius.circular(12)),
-                        child: const Icon(Icons.qr_code_2, color: Colors.white),
+      backgroundColor: Pal.bg,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, box) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: box.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  const SizedBox(height: 360, child: _Collage()),
+                  const Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('conecta', style: display(40)),
+                      const SizedBox(height: 10),
+                      Text('Pasa tu QR, conoce gente y guarda el recuerdo de cada noche.',
+                          style: body(19, color: const Color(0xFFE5E2EC), height: 1.35)),
+                      const SizedBox(height: 28),
+                      BigButton('Empezar', onTap: () => _login(context, newAccount: true)),
+                      const SizedBox(height: 12),
+                      Center(
+                        child: TextButton(
+                          onPressed: () => _login(context, newAccount: false),
+                          child: Text.rich(TextSpan(children: [
+                            TextSpan(text: 'Ya tengo cuenta · ', style: body(14, color: Pal.muted)),
+                            TextSpan(text: 'Entrar', style: body(14, weight: FontWeight.w800)),
+                          ])),
+                        ),
                       ),
-                      const SizedBox(width: 10),
-                      Text('Conecta',
-                          style:
-                              GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
                     ]),
-                    const Spacer(),
-                    Text('Tus redes, solo para quien conoces en persona.', style: title),
-                    const SizedBox(height: 14),
-                    const Text(
-                      'Muestra tu QR y comparte tu WhatsApp, Instagram y Facebook al instante. Escanea el de la otra persona y listo.',
-                      style: TextStyle(color: Color(0xFFCFD0DA), fontSize: 16, height: 1.5),
-                    ),
-                    const SizedBox(height: 28),
-                    feature(Icons.lock_outline, 'Tu QR cambia cada 30 segundos'),
-                    feature(Icons.brush_outlined, 'Foto, fondo y colores a tu gusto'),
-                    feature(Icons.swap_horiz, 'Al escanear, los dos se ven al instante'),
-                    const Spacer(),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF4B3BEF),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        ),
-                        onPressed: () => showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          builder: (_) => const _LoginSheet(),
-                        ),
-                        child: const Text('Entrar con mi correo',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                      ),
-                    ),
-                  ]),
-                ),
+                  ),
+                ]),
               ),
             ),
           ),
         ),
-      ]),
+      ),
     );
   }
 }
 
+class _Collage extends StatelessWidget {
+  const _Collage();
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, box) {
+      final w = box.maxWidth;
+      return Stack(clipBehavior: Clip.none, children: [
+        Positioned(
+            left: w * 0.06, top: 30, child: const PersonPolaroid(id: 'maria', name: 'María', width: 150, angle: -10)),
+        Positioned(
+            right: w * 0.06, top: 14, child: const PersonPolaroid(id: 'juan', name: 'Juan', width: 140, angle: 8)),
+        Positioned(
+          left: w / 2 - 80,
+          top: 150,
+          child: const Polaroid(
+            width: 160,
+            angle: -2,
+            caption: 'yo ✌️',
+            photo: PhotoBox(url: 'assets/backgrounds/oceano.jpg', name: 'yo', id: 'yo'),
+          ),
+        ),
+        Positioned(left: w * 0.08, top: 250, child: const Sticker('📍 Barranco', angle: -8)),
+        Positioned(right: w * 0.07, top: 220, child: const Sticker('¡nos vemos! 🎉', color: 1, angle: 10)),
+      ]);
+    });
+  }
+}
+
 class _LoginSheet extends StatefulWidget {
-  const _LoginSheet();
+  final bool newAccount;
+  const _LoginSheet({required this.newAccount});
   @override
   State<_LoginSheet> createState() => _LoginSheetState();
 }
@@ -122,51 +117,48 @@ class _LoginSheetState extends State<_LoginSheet> {
     final state = context.read<AppState>();
     final demo = state.repo.isDemo;
     return Padding(
-      padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.fromLTRB(24, 26, 24, 24 + MediaQuery.of(context).viewInsets.bottom),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Text(_codeSent ? 'Revisa tu correo' : 'Entra o crea tu cuenta',
-            style: GoogleFonts.spaceGrotesk(fontSize: 22, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 6),
+        Text(_codeSent ? 'Revisa tu correo' : (widget.newAccount ? 'Crea tu cuenta' : 'Entra a tu cuenta'),
+            style: display(22)),
+        const SizedBox(height: 8),
         Text(
           demo
               ? 'Modo demo (sin servidor): escribe cualquier correo y cualquier código.'
               : _codeSent
                   ? 'Te enviamos un código de 6 dígitos a ${_email.text}.'
-                  : 'Te enviaremos un código para entrar. Sin contraseñas.',
-          style: const TextStyle(color: Color(0xFF5B5E6B)),
+                  : 'Te enviamos un código para entrar. Sin contraseñas.',
+          style: body(15, color: Pal.muted),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
         if (!_codeSent)
           TextField(
             controller: _email,
             keyboardType: TextInputType.emailAddress,
             autofillHints: const [AutofillHints.email],
-            decoration: const InputDecoration(labelText: 'Correo', border: OutlineInputBorder()),
+            decoration: const InputDecoration(labelText: 'Correo'),
           )
         else
           TextField(
             controller: _code,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Código', border: OutlineInputBorder()),
+            decoration: const InputDecoration(labelText: 'Código'),
           ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 50,
-          child: FilledButton(
-            onPressed: _busy
-                ? null
-                : () => _run(() async {
-                      if (!_codeSent) {
-                        await state.repo.sendLoginCode(_email.text.trim());
-                        setState(() => _codeSent = true);
-                      } else {
-                        await state.repo.verifyLoginCode(_email.text.trim(), _code.text.trim());
-                        await state.loadAll();
-                        if (context.mounted) Navigator.of(context).pop();
-                      }
-                    }),
-            child: Text(_codeSent ? 'Entrar' : 'Enviar código'),
-          ),
+        const SizedBox(height: 18),
+        BigButton(
+          _busy ? 'Un momento…' : (_codeSent ? 'Entrar' : 'Enviar código'),
+          onTap: _busy
+              ? null
+              : () => _run(() async {
+                    if (!_codeSent) {
+                      await state.repo.sendLoginCode(_email.text.trim());
+                      setState(() => _codeSent = true);
+                    } else {
+                      await state.repo.verifyLoginCode(_email.text.trim(), _code.text.trim());
+                      await state.loadAll();
+                      if (context.mounted) Navigator.of(context).pop();
+                    }
+                  }),
         ),
       ]),
     );

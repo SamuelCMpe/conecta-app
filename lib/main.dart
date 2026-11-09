@@ -9,6 +9,7 @@ import 'data/supabase_repository.dart';
 import 'screens/home_shell.dart';
 import 'screens/welcome_screen.dart';
 import 'state/app_state.dart';
+import 'theme/polaroid.dart';
 
 /// Se pasan al ejecutar:
 /// flutter run --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_KEY=...
@@ -39,11 +40,25 @@ class QrConectaApp extends StatelessWidget {
     return ChangeNotifierProvider.value(
       value: state,
       child: MaterialApp(
-        title: 'QR Conecta',
+        title: 'Conecta',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4B3BEF)),
-          textTheme: GoogleFonts.interTextTheme(),
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: Pal.bg,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Pal.yellow,
+            brightness: Brightness.dark,
+            primary: Pal.yellow,
+            onPrimary: Pal.ink,
+            surface: Pal.card,
+          ),
+          textTheme: GoogleFonts.outfitTextTheme(ThemeData(brightness: Brightness.dark).textTheme),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: const Color(0x14FFFFFF),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+          ),
+          snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
           useMaterial3: true,
         ),
         home: Consumer<AppState>(

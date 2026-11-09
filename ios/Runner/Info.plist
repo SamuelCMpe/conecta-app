@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Usamos la cámara para escanear el QR de otras personas.</string>
+	<string>Usamos la cámara para escanear el QR de otras personas y para la foto juntos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Para elegir tu foto de perfil y tu imagen de fondo.</string>
+	<string>Para elegir la foto de tu polaroid.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Guardamos el barrio donde conociste a cada persona y te mostramos quién está cerca cuando activas Visible. Nunca tu dirección exacta.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
