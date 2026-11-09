@@ -74,7 +74,8 @@ class Avatar extends StatelessWidget {
           image: img == null ? null : DecorationImage(image: img, fit: BoxFit.cover),
         ),
         alignment: Alignment.center,
-        child: img == null ? Text(profile.initials, style: look.titleFont(size: size * 0.36, color: Colors.white)) : null,
+        child:
+            img == null ? Text(profile.initials, style: look.titleFont(size: size * 0.36, color: Colors.white)) : null,
       ),
     );
   }

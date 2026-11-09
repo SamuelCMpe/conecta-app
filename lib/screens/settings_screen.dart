@@ -27,13 +27,15 @@ class SettingsScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 4, bottom: 8),
               child: Text(title.toUpperCase(),
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF5B5E6B), letterSpacing: 0.6)),
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF5B5E6B), letterSpacing: 0.6)),
             ),
             Card(
               elevation: 0,
               margin: EdgeInsets.zero,
               color: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18), side: const BorderSide(color: Color(0xFFE6E7EE))),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18), side: const BorderSide(color: Color(0xFFE6E7EE))),
               clipBehavior: Clip.antiAlias,
               child: Column(children: [
                 for (var i = 0; i < tiles.length; i++) ...[
@@ -79,14 +81,17 @@ class SettingsScreen extends StatelessWidget {
                       Avatar(profile: me, size: 64),
                       const SizedBox(width: 14),
                       Expanded(
-                        child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(me.displayName.isEmpty ? 'Tu nombre' : me.displayName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: ProfileLook(me.style).titleFont(size: 22)),
-                          if (me.username.isNotEmpty)
-                            Text('@${me.username}', style: TextStyle(color: ProfileLook(me.style).subtext)),
-                        ]),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(me.displayName.isEmpty ? 'Tu nombre' : me.displayName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: ProfileLook(me.style).titleFont(size: 22)),
+                              if (me.username.isNotEmpty)
+                                Text('@${me.username}', style: TextStyle(color: ProfileLook(me.style).subtext)),
+                            ]),
                       ),
                     ]),
                   ),
@@ -95,13 +100,18 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 22),
             group('Mi perfil', [
-              tile(Icons.badge_outlined, const Color(0xFF4B3BEF), 'Mis datos', 'Nombre, usuario, descripción, gustos', () => openEditor(0)),
-              tile(Icons.share_outlined, const Color(0xFF25A36A), 'Mis redes', 'WhatsApp, Instagram, Facebook y más', () => openEditor(4)),
+              tile(Icons.badge_outlined, const Color(0xFF4B3BEF), 'Mis datos', 'Nombre, usuario, descripción, gustos',
+                  () => openEditor(0)),
+              tile(Icons.share_outlined, const Color(0xFF25A36A), 'Mis redes', 'WhatsApp, Instagram, Facebook y más',
+                  () => openEditor(4)),
             ]),
             group('Diseño', [
-              tile(Icons.wallpaper_outlined, const Color(0xFFE5733D), 'Fondo', 'Tu imagen, degradados y patrones', () => openEditor(1)),
-              tile(Icons.account_circle_outlined, const Color(0xFFDD2A7B), 'Foto de perfil', 'Foto, forma y aro', () => openEditor(2)),
-              tile(Icons.palette_outlined, const Color(0xFF8134AF), 'Estilo', 'Letra, botones y color', () => openEditor(3)),
+              tile(Icons.wallpaper_outlined, const Color(0xFFE5733D), 'Fondo', 'Tu imagen, degradados y patrones',
+                  () => openEditor(1)),
+              tile(Icons.account_circle_outlined, const Color(0xFFDD2A7B), 'Foto de perfil', 'Foto, forma y aro',
+                  () => openEditor(2)),
+              tile(Icons.palette_outlined, const Color(0xFF8134AF), 'Estilo', 'Letra, botones y color',
+                  () => openEditor(3)),
               tile(Icons.qr_code_2, const Color(0xFF12131A), 'Diseño del QR', 'Colores y forma de tu código',
                   () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => QrDesignScreen(initial: me)))),
             ]),
@@ -125,7 +135,8 @@ class SettingsScreen extends StatelessWidget {
             group('Cuenta', [
               ListTile(
                 leading: const Icon(Icons.logout, color: Color(0xFFB42318)),
-                title: const Text('Cerrar sesión', style: TextStyle(color: Color(0xFFB42318), fontWeight: FontWeight.w600)),
+                title: const Text('Cerrar sesión',
+                    style: TextStyle(color: Color(0xFFB42318), fontWeight: FontWeight.w600)),
                 onTap: state.signOut,
               ),
             ]),

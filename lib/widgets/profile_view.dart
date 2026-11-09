@@ -48,7 +48,8 @@ class ProfileView extends StatelessWidget {
             ],
             if (profile.bio.isNotEmpty) ...[
               const SizedBox(height: 10),
-              Text(profile.bio, textAlign: TextAlign.center, style: TextStyle(color: look.text, fontSize: 15, height: 1.45)),
+              Text(profile.bio,
+                  textAlign: TextAlign.center, style: TextStyle(color: look.text, fontSize: 15, height: 1.45)),
             ],
             if (profile.interests.isNotEmpty) ...[
               const SizedBox(height: 12),

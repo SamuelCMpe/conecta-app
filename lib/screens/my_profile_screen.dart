@@ -3,12 +3,13 @@ import 'package:provider/provider.dart';
 
 import '../state/app_state.dart';
 import '../theme/profile_look.dart';
+import '../widgets/common.dart';
 import '../widgets/profile_view.dart';
+import 'my_qr_screen.dart';
 
-/// Mi perfil tal como lo ven los demás. Para cambiarlo se usa la pestaña Configuración.
+/// Mi perfil tal como lo ven los demás. Arriba, un botón pequeño abre mi QR.
 class MyProfileScreen extends StatelessWidget {
-  final VoidCallback onShowQr;
-  const MyProfileScreen({super.key, required this.onShowQr});
+  const MyProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,22 +19,29 @@ class MyProfileScreen extends StatelessWidget {
 
     return ProfileView(
       profile: me,
-      footer: [
-        SizedBox(
-          height: 54,
-          child: FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: look.accent,
-              foregroundColor: look.onAccent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      topBar: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+        Semantics(
+          button: true,
+          label: 'Mostrar mi QR',
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(fullscreenDialog: true, builder: (_) => const MyQrScreen(active: true)),
             ),
-            onPressed: onShowQr,
-            icon: const Icon(Icons.qr_code_2),
-            label: const Text('Mostrar mi QR', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+            child: Glass(
+              color: look.glass,
+              border: Border.all(color: look.glassBorder),
+              radius: 22,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.qr_code_2, size: 20, color: look.text),
+                const SizedBox(width: 6),
+                Text('Mi QR', style: TextStyle(color: look.text, fontWeight: FontWeight.w600)),
+              ]),
+            ),
           ),
         ),
-        const SizedBox(height: 80),
-      ],
+      ]),
+      footer: const [SizedBox(height: 80)],
     );
   }
 }

@@ -40,7 +40,8 @@ class OtherProfileScreen extends StatelessWidget {
                 const Icon(Icons.swap_horiz, color: Color(0xFF8FE3B4)),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text('${profile.displayName.split(' ').first} también recibió tu perfil. Ya están en sus contactos.',
+                  child: Text(
+                      '${profile.displayName.split(' ').first} también recibió tu perfil. Ya están en sus contactos.',
                       style: TextStyle(color: look.text, fontSize: 13)),
                 ),
               ]),

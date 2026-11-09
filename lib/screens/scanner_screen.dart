@@ -56,7 +56,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
       if (!mounted) return;
       final profile = await context.read<AppState>().scan(token);
       if (!mounted) return;
-      await Navigator.of(context).push(MaterialPageRoute(builder: (_) => OtherProfileScreen(profile: profile, justScanned: true)));
+      await Navigator.of(context)
+          .push(MaterialPageRoute(builder: (_) => OtherProfileScreen(profile: profile, justScanned: true)));
     } catch (e) {
       if (mounted) showError(context, e);
     } finally {
@@ -76,7 +77,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(28, 16, 28, 100),
           child: Column(children: [
-            Text('Escanear', style: GoogleFonts.spaceGrotesk(fontSize: 26, fontWeight: FontWeight.w700, color: Colors.white)),
+            Text('Escanear',
+                style: GoogleFonts.spaceGrotesk(fontSize: 26, fontWeight: FontWeight.w700, color: Colors.white)),
             const SizedBox(height: 6),
             const Text('Apunta la cámara al QR de la otra persona', style: TextStyle(color: Color(0xFFB9BBC7))),
             const SizedBox(height: 28),
@@ -110,7 +112,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
                       ),
                     ),
                   ),
-                  if (_busy) const ColoredBox(color: Color(0x88000000), child: Center(child: CircularProgressIndicator())),
+                  if (_busy)
+                    const ColoredBox(color: Color(0x88000000), child: Center(child: CircularProgressIndicator())),
                 ]),
               ),
             ),

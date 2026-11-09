@@ -48,7 +48,8 @@ class _QrDesignScreenState extends State<QrDesignScreen> {
           child: Container(
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(28)),
-            child: StyledQr(data: 'qrconecta:vista-previa-del-diseno', profile: widget.initial, styleIndex: _style, size: 220),
+            child: StyledQr(
+                data: 'qrconecta:vista-previa-del-diseno', profile: widget.initial, styleIndex: _style, size: 220),
           ),
         ),
         const SizedBox(height: 8),
@@ -76,7 +77,8 @@ class _QrDesignScreenState extends State<QrDesignScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                          color: i == _style ? const Color(0xFF4B3BEF) : const Color(0xFFE6E7EE), width: i == _style ? 3 : 1),
+                          color: i == _style ? const Color(0xFF4B3BEF) : const Color(0xFFE6E7EE),
+                          width: i == _style ? 3 : 1),
                     ),
                     child: Column(children: [
                       Expanded(

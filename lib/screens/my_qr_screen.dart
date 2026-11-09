@@ -85,55 +85,66 @@ class _MyQrScreenState extends State<MyQrScreen> {
     return ProfileBackground(
       style: me.style,
       child: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-            child: Column(children: [
-              Text('Mi QR', textAlign: TextAlign.center, style: look.titleFont(size: 30)),
-              const SizedBox(height: 4),
-              Text('Muéstralo en persona para compartir tu perfil',
-                  textAlign: TextAlign.center, style: TextStyle(color: look.subtext)),
-              const SizedBox(height: 22),
-              Container(
-                padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
-                child: Column(children: [
-                  SizedBox(
-                    width: 250,
-                    height: 250,
-                    child: _token == null
-                        ? Center(
-                            child: _error != null
-                                ? Text(_error!, textAlign: TextAlign.center)
-                                : const CircularProgressIndicator())
-                        : StyledQr(data: _token!.payload, profile: me, styleIndex: me.style.qrStyle),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(me.displayName, style: look.titleFont(size: 20, color: const Color(0xFF12131A))),
-                  const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(3),
-                    child: LinearProgressIndicator(
-                      value: _secs / _visibleSeconds,
-                      minHeight: 6,
-                      color: st.color,
-                      backgroundColor: const Color(0xFFECEDF2),
+        child: Stack(children: [
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 56, 24, 32),
+              child: Column(children: [
+                Text('Mi QR', textAlign: TextAlign.center, style: look.titleFont(size: 30)),
+                const SizedBox(height: 4),
+                Text('Muéstralo en persona para compartir tu perfil',
+                    textAlign: TextAlign.center, style: TextStyle(color: look.subtext)),
+                const SizedBox(height: 22),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30)),
+                  child: Column(children: [
+                    SizedBox(
+                      width: 250,
+                      height: 250,
+                      child: _token == null
+                          ? Center(
+                              child: _error != null
+                                  ? Text(_error!, textAlign: TextAlign.center)
+                                  : const CircularProgressIndicator())
+                          : StyledQr(data: _token!.payload, profile: me, styleIndex: me.style.qrStyle),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    const Icon(Icons.lock_outline, size: 16, color: Color(0xFF5B5E6B)),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text('Nuevo código en $_secs s · las capturas no sirven',
-                          style: const TextStyle(fontSize: 13, color: Color(0xFF5B5E6B))),
+                    const SizedBox(height: 14),
+                    Text(me.displayName, style: look.titleFont(size: 20, color: const Color(0xFF12131A))),
+                    const SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: LinearProgressIndicator(
+                        value: _secs / _visibleSeconds,
+                        minHeight: 6,
+                        color: st.color,
+                        backgroundColor: const Color(0xFFECEDF2),
+                      ),
                     ),
+                    const SizedBox(height: 8),
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      const Icon(Icons.lock_outline, size: 16, color: Color(0xFF5B5E6B)),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text('Nuevo código en $_secs s · las capturas no sirven',
+                            style: const TextStyle(fontSize: 13, color: Color(0xFF5B5E6B))),
+                      ),
+                    ]),
                   ]),
-                ]),
-              ),
-            ]),
+                ),
+              ]),
+            ),
           ),
-        ),
+          Positioned(
+            top: 8,
+            left: 8,
+            child: IconButton(
+              tooltip: 'Cerrar',
+              icon: Icon(Icons.close, color: look.text),
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
+          ),
+        ]),
       ),
     );
   }

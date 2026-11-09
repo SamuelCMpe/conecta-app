@@ -16,7 +16,8 @@ class BackgroundPreset {
 }
 
 const kImagePresets = [
-  BackgroundPreset('montanas', 'Montañas', asset: 'assets/backgrounds/montanas.jpg', dark: true, accent: Color(0xFFFFB27A)),
+  BackgroundPreset('montanas', 'Montañas',
+      asset: 'assets/backgrounds/montanas.jpg', dark: true, accent: Color(0xFFFFB27A)),
   BackgroundPreset('bokeh', 'Luces', asset: 'assets/backgrounds/bokeh.jpg', dark: true, accent: Color(0xFFFF9BC2)),
   BackgroundPreset('oceano', 'Océano', asset: 'assets/backgrounds/oceano.jpg', dark: true, accent: Color(0xFF8BE9F5)),
 ];
@@ -98,7 +99,12 @@ class ProfileLook {
   ({Color bg, Border? border, Color fg, bool blur}) get button {
     switch (style.buttons) {
       case 'relleno':
-        return (bg: dark ? Colors.white : const Color(0xFF1E1A14), border: null, fg: dark ? const Color(0xFF12131A) : Colors.white, blur: false);
+        return (
+          bg: dark ? Colors.white : const Color(0xFF1E1A14),
+          border: null,
+          fg: dark ? const Color(0xFF12131A) : Colors.white,
+          blur: false
+        );
       case 'contorno':
         return (bg: Colors.transparent, border: Border.all(color: text, width: 2), fg: text, blur: false);
       default:
@@ -109,7 +115,8 @@ class ProfileLook {
   LinearGradient get overlay {
     final level = [0.1, 0.4, 0.7][style.dim.clamp(0, 2)];
     if (!dark) {
-      return LinearGradient(colors: [Colors.white.withValues(alpha: level * 0.5), Colors.white.withValues(alpha: level * 0.5)]);
+      return LinearGradient(
+          colors: [Colors.white.withValues(alpha: level * 0.5), Colors.white.withValues(alpha: level * 0.5)]);
     }
     return LinearGradient(
       begin: Alignment.topCenter,
@@ -148,12 +155,12 @@ class ProfileBackground extends StatelessWidget {
       case 'custom':
         final url = style.customBackgroundUrl;
         if (url == null) return Image.asset(kImagePresets.first.asset!, fit: BoxFit.cover);
-        final img = url.startsWith('http')
-            ? Image.network(url, fit: BoxFit.cover)
-            : Image.file(File(url), fit: BoxFit.cover);
+        final img =
+            url.startsWith('http') ? Image.network(url, fit: BoxFit.cover) : Image.file(File(url), fit: BoxFit.cover);
         if (!style.blur) return img;
         return ClipRect(
-          child: ImageFiltered(imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), child: Transform.scale(scale: 1.1, child: img)),
+          child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), child: Transform.scale(scale: 1.1, child: img)),
         );
       case 'aurora':
         return const _Aurora();
@@ -184,7 +191,8 @@ class _Aurora extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget blob(Alignment a, Color c, double r) => DecoratedBox(
-          decoration: BoxDecoration(gradient: RadialGradient(center: a, radius: r, colors: [c, c.withValues(alpha: 0)])),
+          decoration:
+              BoxDecoration(gradient: RadialGradient(center: a, radius: r, colors: [c, c.withValues(alpha: 0)])),
         );
     return Stack(fit: StackFit.expand, children: [
       const ColoredBox(color: Color(0xFF0E0B24)),

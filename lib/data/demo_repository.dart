@@ -41,7 +41,8 @@ class DemoRepository implements AppRepository {
       since: DateTime.now().subtract(const Duration(days: 6)),
     ),
     Contact(
-      profile: const Profile(id: 'demo-juan', displayName: 'Juan Ríos', style: ProfileStyle(background: 'neon', font: 'moderna')),
+      profile: const Profile(
+          id: 'demo-juan', displayName: 'Juan Ríos', style: ProfileStyle(background: 'neon', font: 'moderna')),
       relation: 'mutuo',
       since: DateTime.now().subtract(const Duration(days: 9)),
     ),

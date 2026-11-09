@@ -23,7 +23,8 @@ void main() {
     });
     test('Instagram acepta @usuario o el enlace completo', () {
       expect(networkById('ig').linkFor('@maria.lopez'), 'https://instagram.com/maria.lopez');
-      expect(networkById('ig').linkFor('https://www.instagram.com/maria.lopez/?hl=es'), 'https://instagram.com/maria.lopez');
+      expect(networkById('ig').linkFor('https://www.instagram.com/maria.lopez/?hl=es'),
+          'https://instagram.com/maria.lopez');
     });
     test('vacío no genera enlace', () {
       expect(networkById('fb').linkFor('  '), isNull);
@@ -59,7 +60,7 @@ void main() {
     await settle(tester);
 
     expect(find.text('Samuel Calderón'), findsOneWidget);
-    expect(find.text('Mostrar mi QR'), findsOneWidget);
+    expect(find.text('Mi QR'), findsOneWidget);
 
     await tester.tap(find.text('Ajustes'));
     await settle(tester);

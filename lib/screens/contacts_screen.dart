@@ -53,7 +53,8 @@ class ContactsScreen extends StatelessWidget {
                 const Padding(
                   padding: EdgeInsets.only(bottom: 10, top: 6),
                   child: Text('RECIENTES',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF5B5E6B), letterSpacing: 0.6)),
+                      style: TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF5B5E6B), letterSpacing: 0.6)),
                 ),
               for (final c in state.contacts)
                 Card(
@@ -78,7 +79,8 @@ class ContactsScreen extends StatelessWidget {
                             style: TextButton.styleFrom(
                               foregroundColor: c.revoked ? const Color(0xFF4B3BEF) : const Color(0xFFB42318),
                             ),
-                            child: Text(c.revoked ? 'Devolver acceso' : 'Quitar acceso', style: const TextStyle(fontSize: 12)),
+                            child: Text(c.revoked ? 'Devolver acceso' : 'Quitar acceso',
+                                style: const TextStyle(fontSize: 12)),
                           ),
                   ),
                 ),
@@ -111,7 +113,8 @@ class _RequestCard extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('${request.from.displayName} te envió su perfil', style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text('${request.from.displayName} te envió su perfil',
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
               const Text('Escaneó tu QR', style: TextStyle(fontSize: 13, color: Color(0xFF5B5E6B))),
             ]),
           ),
@@ -120,7 +123,8 @@ class _RequestCard extends StatelessWidget {
         Row(children: [
           Expanded(child: FilledButton(onPressed: () => state.respond(request, true), child: const Text('Aceptar'))),
           const SizedBox(width: 10),
-          Expanded(child: OutlinedButton(onPressed: () => state.respond(request, false), child: const Text('Rechazar'))),
+          Expanded(
+              child: OutlinedButton(onPressed: () => state.respond(request, false), child: const Text('Rechazar'))),
         ]),
       ]),
     );

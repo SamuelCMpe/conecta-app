@@ -79,7 +79,13 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
             controller: _tabs,
             isScrollable: true,
             tabAlignment: TabAlignment.start,
-            tabs: const [Tab(text: 'Datos'), Tab(text: 'Fondo'), Tab(text: 'Foto'), Tab(text: 'Estilo'), Tab(text: 'Redes')],
+            tabs: const [
+              Tab(text: 'Datos'),
+              Tab(text: 'Fondo'),
+              Tab(text: 'Foto'),
+              Tab(text: 'Estilo'),
+              Tab(text: 'Redes')
+            ],
           ),
         ),
         Expanded(
@@ -149,7 +155,8 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         padding: const EdgeInsets.only(bottom: 20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title.toUpperCase(),
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF5B5E6B), letterSpacing: 0.6)),
+              style: const TextStyle(
+                  fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF5B5E6B), letterSpacing: 0.6)),
           const SizedBox(height: 10),
           ...children,
         ]),
@@ -201,7 +208,8 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
         ]),
         const SizedBox(height: 10),
         Row(children: [
-          Expanded(child: TextField(controller: _newInterest, decoration: _dec('Nuevo gusto', hint: 'Ej: Cocina, Gaming'))),
+          Expanded(
+              child: TextField(controller: _newInterest, decoration: _dec('Nuevo gusto', hint: 'Ej: Cocina, Gaming'))),
           const SizedBox(width: 8),
           FilledButton(
             onPressed: () {
@@ -240,7 +248,12 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
     ]);
   }
 
-  Widget _thumb({required bool selected, required Widget child, required VoidCallback onTap, required String label, double height = 104}) {
+  Widget _thumb(
+      {required bool selected,
+      required Widget child,
+      required VoidCallback onTap,
+      required String label,
+      double height = 104}) {
     return Semantics(
       button: true,
       selected: selected,
@@ -268,7 +281,8 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(label,
-                        maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                        maxLines: 1,
+                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
                   ),
                 ),
               ),
@@ -307,8 +321,10 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
                 }
               },
               child: custom == null
-                  ? const ColoredBox(color: Color(0xFFF0F1F5), child: Icon(Icons.add_photo_alternate_outlined, size: 28))
-                  : ProfileBackground(style: _s.copyWith(background: 'custom', dim: 0, blur: false), child: const SizedBox()),
+                  ? const ColoredBox(
+                      color: Color(0xFFF0F1F5), child: Icon(Icons.add_photo_alternate_outlined, size: 28))
+                  : ProfileBackground(
+                      style: _s.copyWith(background: 'custom', dim: 0, blur: false), child: const SizedBox()),
             ),
             for (final p in kImagePresets)
               Padding(
@@ -415,11 +431,14 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(80),
-                    side: BorderSide(color: _s.font == f.$1 ? const Color(0xFF4B3BEF) : const Color(0xFFD5D7E0), width: 2),
+                    side: BorderSide(
+                        color: _s.font == f.$1 ? const Color(0xFF4B3BEF) : const Color(0xFFD5D7E0), width: 2),
                   ),
                   onPressed: () => _style(_s.copyWith(font: f.$1)),
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Text('Aa', style: ProfileLook(_s.copyWith(font: f.$1)).titleFont(size: 26, color: const Color(0xFF12131A))),
+                    Text('Aa',
+                        style:
+                            ProfileLook(_s.copyWith(font: f.$1)).titleFont(size: 26, color: const Color(0xFF12131A))),
                     Text(f.$2, style: const TextStyle(fontSize: 12)),
                   ]),
                 ),
@@ -439,7 +458,9 @@ class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderSt
               label: i == 0 ? 'Color del fondo' : 'Color ${i + 1}',
               selected: i == 0 ? _s.accent == null : _s.accent == accents[i].toARGB32(),
               child: GestureDetector(
-                onTap: () => i == 0 ? _style(_s.copyWith(clearAccent: true)) : _style(_s.copyWith(accent: accents[i].toARGB32())),
+                onTap: () => i == 0
+                    ? _style(_s.copyWith(clearAccent: true))
+                    : _style(_s.copyWith(accent: accents[i].toARGB32())),
                 child: Container(
                   width: 48,
                   height: 48,
