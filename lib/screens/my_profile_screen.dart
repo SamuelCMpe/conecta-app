@@ -41,7 +41,6 @@ class MyProfileScreen extends StatelessWidget {
           ),
         ),
       ]),
-      footer: const [SizedBox(height: 80)],
     );
   }
 }
