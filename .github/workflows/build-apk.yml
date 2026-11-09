@@ -1,0 +1,53 @@
+name: Generar APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+      # Si en Settings > Secrets existen SUPABASE_URL y SUPABASE_KEY, la app usa el servidor real;
+      # si no, arranca en modo demo.
+      - name: Compilar APK
+        run: |
+          flutter build apk --release \
+            --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
+            --dart-define=SUPABASE_KEY="${{ secrets.SUPABASE_KEY }}"
+          cp build/app/outputs/flutter-apk/app-release.apk conecta.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conecta-apk
+          path: conecta.apk
+
+      - name: Publicar en Releases (enlace de descarga)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ultima
+          name: Última versión
+          body: APK generado automáticamente desde la rama main (commit ${{ github.sha }}).
+          prerelease: true
+          make_latest: false
+          files: conecta.apk

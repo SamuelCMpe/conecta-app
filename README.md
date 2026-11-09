@@ -60,3 +60,12 @@ assets/backgrounds/          fondos de ejemplo
 flutter analyze
 flutter test
 ```
+
+## Descargar el APK (Android)
+
+Cada vez que se sube código a `main`, GitHub genera el APK solo (ver `.github/workflows/build-apk.yml`).
+Se descarga desde **Releases → Última versión → conecta.apk**:
+https://github.com/SamuelCMpe/conecta-app/releases/tag/ultima
+
+Para instalarlo en Android tienes que permitir "instalar apps de origen desconocido" cuando el teléfono lo pida.
+Si agregas los secretos `SUPABASE_URL` y `SUPABASE_KEY` en *Settings → Secrets and variables → Actions*, el APK usará tu servidor; si no, arranca en modo demo.
