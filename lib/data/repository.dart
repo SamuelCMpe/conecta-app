@@ -50,7 +50,7 @@ abstract class AppRepository {
   /// Crea un código nuevo que caduca en pocos segundos.
   Future<QrToken> createQrToken();
 
-  /// Canjea el QR de otra persona: devuelve su perfil y le envía el tuyo.
+  /// Canjea el QR de otra persona: devuelve su perfil y, al mismo tiempo, ella pasa a ver el tuyo.
   Future<Profile> redeemQrToken(String token);
 
   Future<List<Contact>> loadContacts();

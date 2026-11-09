@@ -59,9 +59,12 @@ void main() {
     await settle(tester);
 
     expect(find.text('Samuel Calderón'), findsOneWidget);
-    expect(find.text('Personalizar'), findsOneWidget);
+    expect(find.text('Mostrar mi QR'), findsOneWidget);
 
-    await tester.tap(find.text('Personalizar'));
+    await tester.tap(find.text('Ajustes'));
+    await settle(tester);
+    expect(find.text('Configuración'), findsOneWidget);
+    await tester.tap(find.text('Mis datos'));
     await settle(tester);
     expect(find.byType(EditorScreen), findsOneWidget);
     await tester.enterText(find.widgetWithText(TextField, 'Nombre que se muestra'), 'Samuel C.');
@@ -70,11 +73,20 @@ void main() {
     await settle(tester);
     expect(state.me!.displayName, 'Samuel C.');
 
-    await tester.tap(find.text('Contactos'));
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -400));
     await settle(tester);
-    expect(find.text('Juan Ríos te envió su perfil'), findsOneWidget);
-    await tester.tap(find.text('Aceptar'));
+    await tester.tap(find.text('Diseño del QR'));
     await settle(tester);
-    expect(find.text('Juan Ríos'), findsOneWidget);
+    await tester.tap(find.text('Coral con puntos'));
+    await tester.tap(find.text('Guardar'));
+    await settle(tester);
+    expect(state.me!.style.qrStyle, 3);
+
+    await tester.tap(find.text('Escanear'));
+    await settle(tester);
+    await tester.tap(find.text('Simular escaneo'));
+    await settle(tester);
+    expect(find.textContaining('también recibió tu perfil'), findsOneWidget);
+    expect(state.contacts.first.profile.displayName, 'María López');
   });
 }

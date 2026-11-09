@@ -10,7 +10,8 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = GoogleFonts.spaceGrotesk(fontSize: 40, fontWeight: FontWeight.w700, color: Colors.white, height: 1.05);
+    final title =
+        GoogleFonts.spaceGrotesk(fontSize: 40, fontWeight: FontWeight.w700, color: Colors.white, height: 1.05);
     Widget feature(IconData icon, String text) => Padding(
           padding: const EdgeInsets.only(bottom: 14),
           child: Row(children: [
@@ -33,48 +34,59 @@ class WelcomeScreen extends StatelessWidget {
           ),
         ),
         SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(color: const Color(0xFF4B3BEF), borderRadius: BorderRadius.circular(12)),
-                  child: const Icon(Icons.qr_code_2, color: Colors.white),
+          child: LayoutBuilder(
+            builder: (context, box) => SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: box.maxHeight - 48),
+                child: IntrinsicHeight(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration:
+                            BoxDecoration(color: const Color(0xFF4B3BEF), borderRadius: BorderRadius.circular(12)),
+                        child: const Icon(Icons.qr_code_2, color: Colors.white),
+                      ),
+                      const SizedBox(width: 10),
+                      Text('Conecta',
+                          style:
+                              GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
+                    ]),
+                    const Spacer(),
+                    Text('Tus redes, solo para quien conoces en persona.', style: title),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Muestra tu QR y comparte tu WhatsApp, Instagram y Facebook al instante. Escanea el de la otra persona y listo.',
+                      style: TextStyle(color: Color(0xFFCFD0DA), fontSize: 16, height: 1.5),
+                    ),
+                    const SizedBox(height: 28),
+                    feature(Icons.lock_outline, 'Tu QR cambia cada 30 segundos'),
+                    feature(Icons.brush_outlined, 'Foto, fondo y colores a tu gusto'),
+                    feature(Icons.swap_horiz, 'Al escanear, los dos se ven al instante'),
+                    const Spacer(),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 54,
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF4B3BEF),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        onPressed: () => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (_) => const _LoginSheet(),
+                        ),
+                        child: const Text('Entrar con mi correo',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                  ]),
                 ),
-                const SizedBox(width: 10),
-                Text('Conecta', style: GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white)),
-              ]),
-              const Spacer(),
-              Text('Tus redes, solo para quien conoces en persona.', style: title),
-              const SizedBox(height: 14),
-              const Text(
-                'Muestra tu QR y comparte tu WhatsApp, Instagram y Facebook al instante. Escanea el de la otra persona y listo.',
-                style: TextStyle(color: Color(0xFFCFD0DA), fontSize: 16, height: 1.5),
               ),
-              const SizedBox(height: 28),
-              feature(Icons.lock_outline, 'Tu QR cambia cada 30 segundos'),
-              feature(Icons.brush_outlined, 'Foto, fondo y colores a tu gusto'),
-              feature(Icons.swap_horiz, 'Intercambio mutuo de perfiles'),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF4B3BEF),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  onPressed: () => showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) => const _LoginSheet(),
-                  ),
-                  child: const Text('Entrar con mi correo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                ),
-              ),
-            ]),
+            ),
           ),
         ),
       ]),

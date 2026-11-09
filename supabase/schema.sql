@@ -80,8 +80,8 @@ begin
   return query select v_token, v_exp;
 end $$;
 
--- Escaneo el QR de otra persona: obtengo acceso a su perfil
--- y le envío el mío como solicitud pendiente.
+-- Escaneo el QR de otra persona: los dos pasamos a ver el perfil del otro al instante.
+-- (Mostrar el QR es el permiso de quien lo muestra; escanearlo es el permiso de quien escanea.)
 create or replace function public.redeem_qr_token(p_token text)
 returns jsonb
 language plpgsql security definer set search_path = public as $$
@@ -97,9 +97,8 @@ begin
   insert into access (viewer_id, owner_id, status) values (auth.uid(), v_owner, 'active')
   on conflict (viewer_id, owner_id) do update set status = 'active', created_at = now();
 
-  insert into access (viewer_id, owner_id, status) values (v_owner, auth.uid(), 'pending')
-  on conflict (viewer_id, owner_id) do update set status = 'pending', created_at = now()
-    where access.status = 'rejected';
+  insert into access (viewer_id, owner_id, status) values (v_owner, auth.uid(), 'active')
+  on conflict (viewer_id, owner_id) do update set status = 'active', created_at = now();
 
   select to_jsonb(p) into v_profile from profiles p where p.id = v_owner;
   return coalesce(v_profile, jsonb_build_object('id', v_owner));

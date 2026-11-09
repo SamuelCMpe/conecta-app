@@ -23,6 +23,9 @@ class ProfileStyle {
   /// null = color del fondo
   final int? accent;
 
+  /// índice en kQrStyles
+  final int qrStyle;
+
   const ProfileStyle({
     this.background = 'montanas',
     this.customBackgroundUrl,
@@ -33,6 +36,7 @@ class ProfileStyle {
     this.font = 'elegante',
     this.buttons = 'vidrio',
     this.accent,
+    this.qrStyle = 1,
   });
 
   ProfileStyle copyWith({
@@ -46,6 +50,7 @@ class ProfileStyle {
     String? buttons,
     int? accent,
     bool clearAccent = false,
+    int? qrStyle,
   }) {
     return ProfileStyle(
       background: background ?? this.background,
@@ -57,6 +62,7 @@ class ProfileStyle {
       font: font ?? this.font,
       buttons: buttons ?? this.buttons,
       accent: clearAccent ? null : (accent ?? this.accent),
+      qrStyle: qrStyle ?? this.qrStyle,
     );
   }
 
@@ -70,6 +76,7 @@ class ProfileStyle {
         'font': font,
         'buttons': buttons,
         'accent': accent,
+        'qrStyle': qrStyle,
       };
 
   factory ProfileStyle.fromJson(Map<String, dynamic>? j) {
@@ -84,6 +91,7 @@ class ProfileStyle {
       font: j['font'] as String? ?? 'elegante',
       buttons: j['buttons'] as String? ?? 'vidrio',
       accent: (j['accent'] as num?)?.toInt(),
+      qrStyle: (j['qrStyle'] as num?)?.toInt() ?? 1,
     );
   }
 }

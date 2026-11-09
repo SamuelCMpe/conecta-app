@@ -22,7 +22,7 @@ class ContactsScreen extends StatelessWidget {
   String _relation(Contact c) {
     if (c.revoked) return 'Ya no puede ver tu perfil';
     final r = switch (c.relation) {
-      'mutuo' => 'Se escanearon mutuamente',
+      'mutuo' => 'Se conocieron',
       'te_escaneo' => 'Te escaneó',
       _ => 'Lo escaneaste',
     };

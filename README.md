@@ -5,10 +5,11 @@ App en Flutter para compartir tu WhatsApp, Instagram, Facebook y otras redes **s
 ## Qué hace
 
 - **Mi perfil:** nombre, usuario, ciudad, descripción, gustos, redes y un enlace destacado opcional.
-- **Personalizar:** pestañas Datos, Fondo (imágenes, tu propia foto, degradados, patrones, oscurecer, desenfocar), Foto (forma y aro), Estilo (letra, botones, color de acento) y Redes (9 redes; escribes tu número, usuario o enlace y la app arma el enlace).
+- **Personalizar (en Ajustes):** pestañas Datos, Fondo (imágenes, tu propia foto, degradados, patrones, oscurecer, desenfocar), Foto (forma y aro), Estilo (letra, botones, color de acento) y Redes (9 redes; escribes tu número, usuario o enlace y la app arma el enlace).
 - **Mi QR:** el código cambia cada 30 segundos, así una foto o captura deja de servir. 4 estilos de QR.
-- **Escanear:** con la cámara. Al escanear, ves el perfil de la otra persona y ella recibe el tuyo como solicitud.
-- **Contactos:** aceptar o rechazar solicitudes, y quitar o devolver el acceso a tu perfil.
+- **Escanear:** con la cámara. Al escanear, los dos ven el perfil del otro al instante.
+- **Contactos:** las personas que conociste, y el botón para quitar o devolver el acceso a tu perfil.
+- **Ajustes:** todo lo que se personaliza (datos, redes, fondo, foto, estilo y diseño del QR) y la cuenta.
 
 ## Probarla rápido (modo demo, sin servidor)
 
@@ -35,7 +36,7 @@ flutter run --dart-define=SUPABASE_URL=https://TU-PROYECTO.supabase.co --dart-de
 
 - Tu perfil solo lo pueden leer las personas que escanearon tu QR (regla en la base de datos, no solo en la app).
 - El QR lleva un código aleatorio que caduca a los 40 segundos (30 visibles + 10 de margen).
-- Al escanear a alguien, tu perfil le llega como **solicitud**: lo ve solo si lo acepta.
+- Al escanear a alguien, los dos se ven al instante: mostrar el QR es el permiso de uno y escanearlo es el permiso del otro.
 - Desde Contactos puedes quitarle el acceso a cualquiera en cualquier momento.
 - Pendiente para más adelante: las fotos se guardan en una carpeta pública con nombres aleatorios; si quieres más privacidad se pueden servir con enlaces firmados.
 

@@ -6,6 +6,7 @@ import 'contacts_screen.dart';
 import 'my_profile_screen.dart';
 import 'my_qr_screen.dart';
 import 'scanner_screen.dart';
+import 'settings_screen.dart';
 
 /// Pantalla principal con la barra de abajo.
 class HomeShell extends StatefulWidget {
@@ -27,6 +28,7 @@ class HomeShellState extends State<HomeShell> {
       MyQrScreen(active: _tab == 1),
       ScannerScreen(active: _tab == 2),
       const ContactsScreen(),
+      const SettingsScreen(),
     ];
     return Scaffold(
       extendBody: true,
@@ -43,6 +45,7 @@ class HomeShellState extends State<HomeShell> {
             selectedIcon: const Icon(Icons.people),
             label: 'Contactos',
           ),
+          const NavigationDestination(icon: Icon(Icons.tune), label: 'Ajustes'),
         ],
       ),
     );

@@ -115,7 +115,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text('Al escanear, la otra persona también recibe tu perfil y decide si lo acepta.',
+            const Text('Al escanear, los dos verán el perfil del otro al instante.',
                 textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFB9BBC7))),
             const Spacer(),
             Row(children: [

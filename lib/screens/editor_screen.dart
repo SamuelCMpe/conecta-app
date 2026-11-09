@@ -11,14 +11,15 @@ import '../widgets/common.dart';
 /// "Personalizar": datos, fondo, foto, estilo y redes, con vista previa en vivo.
 class EditorScreen extends StatefulWidget {
   final Profile initial;
-  const EditorScreen({super.key, required this.initial});
+  final int initialTab;
+  const EditorScreen({super.key, required this.initial, this.initialTab = 0});
   @override
   State<EditorScreen> createState() => _EditorScreenState();
 }
 
 class _EditorScreenState extends State<EditorScreen> with SingleTickerProviderStateMixin {
   late Profile _p = widget.initial;
-  late final TabController _tabs = TabController(length: 5, vsync: this);
+  late final TabController _tabs = TabController(length: 5, vsync: this, initialIndex: widget.initialTab);
   late final _name = TextEditingController(text: _p.displayName);
   late final _user = TextEditingController(text: _p.username);
   late final _city = TextEditingController(text: _p.city);

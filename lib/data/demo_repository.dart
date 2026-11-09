@@ -37,17 +37,17 @@ class DemoRepository implements AppRepository {
     ),
     Contact(
       profile: const Profile(id: 'demo-ana', displayName: 'Ana Paredes', style: ProfileStyle(background: 'bokeh')),
-      relation: 'te_escaneo',
+      relation: 'mutuo',
       since: DateTime.now().subtract(const Duration(days: 6)),
+    ),
+    Contact(
+      profile: const Profile(id: 'demo-juan', displayName: 'Juan Ríos', style: ProfileStyle(background: 'neon', font: 'moderna')),
+      relation: 'mutuo',
+      since: DateTime.now().subtract(const Duration(days: 9)),
     ),
   ];
 
-  final List<ContactRequest> _requests = [
-    ContactRequest(
-      from: const Profile(id: 'demo-juan', displayName: 'Juan Ríos', style: ProfileStyle(background: 'neon', font: 'moderna')),
-      at: DateTime.now().subtract(const Duration(minutes: 2)),
-    ),
-  ];
+  final List<ContactRequest> _requests = [];
 
   @override
   bool get isDemo => true;
@@ -83,7 +83,7 @@ class DemoRepository implements AppRepository {
   @override
   Future<Profile> redeemQrToken(String token) async {
     if (!_contacts.any((c) => c.profile.id == _maria.id)) {
-      _contacts.insert(0, Contact(profile: _maria, relation: 'escaneaste', since: DateTime.now()));
+      _contacts.insert(0, Contact(profile: _maria, relation: 'mutuo', since: DateTime.now()));
     }
     return _maria;
   }
