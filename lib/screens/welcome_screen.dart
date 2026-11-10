@@ -107,6 +107,7 @@ class _LoginSheetState extends State<_LoginSheet> {
   final _code = TextEditingController();
   bool _codeSent = false;
   bool _busy = false;
+  String? _error;
 
   @override
   void initState() {
@@ -128,11 +129,15 @@ class _LoginSheetState extends State<_LoginSheet> {
   }
 
   Future<void> _run(Future<void> Function() f) async {
-    setState(() => _busy = true);
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
     try {
       await f();
     } catch (e) {
-      if (mounted) showError(context, e);
+      // El error se muestra dentro de la hoja (un aviso abajo quedaría tapado por ella).
+      if (mounted) setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -169,6 +174,10 @@ class _LoginSheetState extends State<_LoginSheet> {
           const SizedBox(height: 6),
           Text('Si no llega en un minuto, mira en Spam o Promociones.', style: body(13, color: Pal.muted)),
           const SizedBox(height: 20),
+          if (_error != null) ...[
+            Text(_error!, style: body(14, color: Pal.pink, height: 1.35)),
+            const SizedBox(height: 12),
+          ],
           if (state.loading)
             const Center(child: CircularProgressIndicator(color: Pal.yellow))
           else
@@ -220,6 +229,10 @@ class _LoginSheetState extends State<_LoginSheet> {
             decoration: const InputDecoration(labelText: 'Código'),
           ),
         const SizedBox(height: 18),
+        if (_error != null) ...[
+          Text(_error!, style: body(14, color: Pal.pink, height: 1.35)),
+          const SizedBox(height: 12),
+        ],
         BigButton(
           _busy ? 'Un momento…' : (_codeSent ? 'Entrar' : (link ? 'Enviar enlace' : 'Enviar código')),
           onTap: _busy

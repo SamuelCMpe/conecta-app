@@ -49,8 +49,19 @@ class SupabaseRepository implements AppRepository {
   static const loginRedirect = 'https://samuelcmpe.github.io/conecta-app/login/';
 
   @override
-  Future<void> sendLoginCode(String email) =>
-      _db.auth.signInWithOtp(email: email, shouldCreateUser: true, emailRedirectTo: loginRedirect);
+  Future<void> sendLoginCode(String email) async {
+    try {
+      await _db.auth.signInWithOtp(email: email, shouldCreateUser: true, emailRedirectTo: loginRedirect);
+    } on AuthException catch (e) {
+      final m = '${e.code} ${e.message}'.toLowerCase();
+      if (e.statusCode == '429' || m.contains('rate limit')) {
+        throw Exception('Se mandaron muchos correos en poco tiempo. Espera unos minutos y vuelve a intentar, '
+            'o usa el enlace del último correo que te llegó.');
+      }
+      if (m.contains('invalid') && m.contains('email')) throw Exception('Ese correo no es válido.');
+      throw Exception('No se pudo enviar el correo. Revisa tu internet e inténtalo otra vez.');
+    }
+  }
 
   @override
   Future<void> verifyLoginCode(String email, String code) async {
