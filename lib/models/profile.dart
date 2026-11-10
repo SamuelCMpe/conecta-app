@@ -274,6 +274,31 @@ class Contact {
     this.note = '',
   });
 
+  /// Para guardar el muro en el celular (y verlo sin conexión).
+  Map<String, dynamic> toJson() => {
+        'profile': profile.toRow(),
+        'relation': relation,
+        'since': since.toIso8601String(),
+        'revoked': revoked,
+        'place': place,
+        'lat': lat,
+        'lng': lng,
+        'selfie_url': selfieUrl,
+        'note': note,
+      };
+
+  factory Contact.fromJson(Map<String, dynamic> m) => Contact(
+        profile: Profile.fromRow((m['profile'] as Map).cast<String, dynamic>()),
+        relation: m['relation'] as String? ?? 'mutuo',
+        since: DateTime.parse(m['since'] as String),
+        revoked: m['revoked'] as bool? ?? false,
+        place: m['place'] as String? ?? '',
+        lat: (m['lat'] as num?)?.toDouble(),
+        lng: (m['lng'] as num?)?.toDouble(),
+        selfieUrl: m['selfie_url'] as String?,
+        note: m['note'] as String? ?? '',
+      );
+
   Contact copyWith({bool? revoked, String? selfieUrl, String? note, String? place}) => Contact(
         profile: profile,
         relation: relation,
@@ -311,4 +336,27 @@ class NearbyPerson {
       sticker: sticker,
       wavedAtMe: wavedAtMe,
       iWaved: iWaved ?? this.iWaved);
+}
+
+/// Un aviso: alguien te saludó, te escaneó o se unió a tu grupo.
+class ActivityItem {
+  final int id;
+
+  /// 'wave' | 'connect' | 'group'
+  final String kind;
+  final String actorId;
+  final String firstName;
+  const ActivityItem({required this.id, required this.kind, required this.actorId, this.firstName = ''});
+
+  String get message {
+    final who = firstName.isEmpty ? 'Alguien' : firstName;
+    switch (kind) {
+      case 'wave':
+        return '$who te saludó 👋';
+      case 'group':
+        return '$who se unió a tu grupo 👯';
+      default:
+        return '$who escaneó tu QR. Ya está en tu muro 📸';
+    }
+  }
 }

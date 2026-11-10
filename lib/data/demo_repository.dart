@@ -159,4 +159,53 @@ class DemoRepository implements AppRepository {
 
   @override
   Future<void> report(String userId, String reason) async {}
+
+  // ---------- Modo grupo (demo) ----------
+  static const _groupPeople = [
+    Profile(id: 'demo-sofi', displayName: 'Sofía Ramos', style: ProfileStyle(stickers: ['💃 salsera']),
+        socials: {'ig': 'sofi.ramos'}),
+    Profile(id: 'demo-mateo', displayName: 'Mateo Díaz', style: ProfileStyle(stickers: ['🎸 rockero']),
+        socials: {'wa': '+51 999 333 444'}),
+    Profile(id: 'demo-vale', displayName: 'Valeria Soto', style: ProfileStyle(stickers: ['🎧 techno']),
+        socials: {'ig': 'vale.soto'}),
+  ];
+  int _groupJoined = 0;
+  DateTime? _groupStart;
+
+  @override
+  Future<QrToken> createGroup({MeetPlace? place}) async {
+    _groupStart = DateTime.now();
+    final token = List.generate(24, (_) => 'abcdefghijkmnpqrstuvwxyz23456789'[_rand.nextInt(32)]).join();
+    return QrToken(token, DateTime.now().add(const Duration(hours: 3)), group: true);
+  }
+
+  /// En la demo se va sumando una persona cada pocos segundos.
+  @override
+  Future<int> groupSize(String token) async {
+    final start = _groupStart;
+    if (start == null) return 1;
+    return 1 + min(4, DateTime.now().difference(start).inSeconds ~/ 4);
+  }
+
+  @override
+  Future<void> endGroup(String token) async => _groupStart = null;
+
+  @override
+  Future<List<Profile>> joinGroup(String token, {MeetPlace? place}) async {
+    _groupJoined++;
+    final now = DateTime.now();
+    for (final p in _groupPeople) {
+      _contacts.removeWhere((c) => c.profile.id == p.id);
+      _contacts.insert(
+          0,
+          Contact(
+              profile: p, relation: 'mutuo', since: now, place: place?.name ?? '', lat: place?.lat, lng: place?.lng));
+    }
+    return _groupPeople;
+  }
+
+  int get groupJoins => _groupJoined;
+
+  @override
+  Future<List<ActivityItem>> loadActivity(int afterId) async => const [];
 }

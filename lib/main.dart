@@ -27,7 +27,12 @@ Future<void> main() async {
     repo = DemoRepository();
   }
   final state = AppState(repo);
-  await state.loadAll();
+  try {
+    await state.loadAll();
+  } catch (e) {
+    // Sin internet y sin nada guardado: la app abre igual y se reintenta luego.
+    debugPrint('No se pudo cargar: $e');
+  }
   runApp(QrConectaApp(state: state));
 }
 

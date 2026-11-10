@@ -7,6 +7,7 @@ import '../models/nights.dart';
 import '../state/app_state.dart';
 import '../theme/polaroid.dart';
 import 'connected_screen.dart';
+import 'group_joined_screen.dart';
 import 'contact_screen.dart';
 import 'nearby_view.dart';
 
@@ -69,9 +70,12 @@ class _ScannerScreenState extends State<ScannerScreen> {
     await _controller.stop();
     try {
       if (!mounted) return;
-      final profile = await context.read<AppState>().scan(token);
+      final result = await context.read<AppState>().scan(token);
       if (!mounted) return;
-      await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ConnectedScreen(profileId: profile.id)));
+      await Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => result.group
+              ? GroupJoinedScreen(people: result.people)
+              : ConnectedScreen(profileId: result.people.first.id)));
     } catch (e) {
       if (mounted) showError(context, e);
     } finally {
@@ -160,13 +164,17 @@ class _ScannerScreenState extends State<ScannerScreen> {
               ),
               if (state.repo.isDemo) ...[
                 const SizedBox(height: 18),
-                Center(
-                  child: TextButton.icon(
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  TextButton.icon(
                     onPressed: _busy ? null : () => _redeem('demo'),
                     icon: const Icon(Icons.bolt, color: Pal.yellow),
                     label: Text('Simular escaneo', style: body(15, weight: FontWeight.w700)),
                   ),
-                ),
+                  TextButton(
+                    onPressed: _busy ? null : () => _redeem('${kGroupPrefix}demo'),
+                    child: Text('👯 Grupo', style: body(15, weight: FontWeight.w700)),
+                  ),
+                ]),
               ],
               const Spacer(),
               if (today.isNotEmpty) ...[

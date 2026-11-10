@@ -8,7 +8,9 @@ import 'package:qr_conecta/models/networks.dart';
 import 'package:qr_conecta/models/nights.dart';
 import 'package:qr_conecta/models/profile.dart';
 import 'package:qr_conecta/screens/polaroid_editor_screen.dart';
+import 'package:qr_conecta/services/notifier.dart';
 import 'package:qr_conecta/state/app_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> settle(WidgetTester t) async {
   for (var i = 0; i < 15; i++) {
@@ -38,6 +40,43 @@ void main() {
     expect(tokenFromPayload('https://otra-cosa.com'), isNull);
   });
 
+  test('el QR de grupo lleva su marca', () {
+    final t = QrToken('abc', DateTime.now(), group: true);
+    expect(t.payload, 'qrconecta:g:abc');
+    expect(tokenFromPayload(t.payload), 'g:abc');
+  });
+
+  test('escanear un QR de grupo conecta con todos y programa el recordatorio', () async {
+    SharedPreferences.setMockInitialValues({});
+    final notifier = SilentNotifier();
+    final state = AppState(DemoRepository(), notifier: notifier);
+    await state.repo.verifyLoginCode('a@b.c', '1');
+    await state.loadAll();
+    final r = await state.scan('g:abc');
+    expect(r.group, isTrue);
+    expect(r.people.length, 3);
+    expect(state.contactById('demo-sofi')!.place, 'Barranco');
+    expect(notifier.scheduled.single.$2, contains('personas en Barranco'));
+    expect(notifier.scheduled.single.$1.hour, 12);
+  });
+
+  test('el muro se guarda y se puede ver sin conexión', () async {
+    SharedPreferences.setMockInitialValues({});
+    final repo = _FlakyRepo();
+    final state = AppState(repo, notifier: SilentNotifier());
+    await repo.verifyLoginCode('a@b.c', '1');
+    await state.loadAll();
+    final n = state.contacts.length;
+    expect(state.offline, isFalse);
+
+    repo.down = true;
+    final again = AppState(repo, notifier: SilentNotifier());
+    await again.loadAll();
+    expect(again.offline, isTrue);
+    expect(again.contacts.length, n);
+    expect(again.me!.displayName, 'Samuel Calderón');
+  });
+
   test('lo de la madrugada cuenta como la noche anterior', () {
     final p = const Profile(id: 'x', displayName: 'X');
     final noche = [
@@ -62,7 +101,8 @@ void main() {
       FlutterError.presentError(d);
     };
 
-    final state = AppState(DemoRepository());
+    SharedPreferences.setMockInitialValues({});
+    final state = AppState(DemoRepository(), notifier: SilentNotifier());
     await tester.pumpWidget(QrConectaApp(state: state));
     expect(find.text('Empezar'), findsOneWidget);
 
@@ -147,4 +187,13 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await settle(tester);
   });
+}
+
+/// Demo que puede "perder la conexión".
+class _FlakyRepo extends DemoRepository {
+  bool down = false;
+  @override
+  Future<Profile> loadMyProfile() => down ? Future.error(Exception('sin red')) : super.loadMyProfile();
+  @override
+  Future<List<Contact>> loadContacts() => down ? Future.error(Exception('sin red')) : super.loadContacts();
 }

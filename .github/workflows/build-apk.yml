@@ -28,6 +28,32 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
+      - name: Revisar secretos
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "::warning::Faltan SUPABASE_URL o SUPABASE_KEY: la APK sale en MODO DEMO."
+          else
+            echo "Servidor real configurado."
+          fi
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::Falta KEYSTORE_BASE64: la APK se firma con una clave de prueba y no se podrá actualizar encima."
+          fi
+
+      - name: Preparar firma
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/conecta-upload.jks
+            printf 'storeFile=conecta-upload.jks\nstorePassword=%s\nkeyAlias=conecta\nkeyPassword=%s\n' \
+              "$KEYSTORE_PASSWORD" "$KEYSTORE_PASSWORD" > android/key.properties
+          fi
+
       # Si en Settings > Secrets existen SUPABASE_URL y SUPABASE_KEY, la app usa el servidor real;
       # si no, arranca en modo demo.
       - name: Compilar APK

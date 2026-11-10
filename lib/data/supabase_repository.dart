@@ -17,6 +17,22 @@ class SupabaseRepository implements AppRepository {
   @override
   String? get userId => _db.auth.currentUser?.id;
 
+  /// Llama a una función del servidor y traduce los errores conocidos.
+  Future<dynamic> _rpc(String fn, [Map<String, dynamic>? params]) async {
+    try {
+      return await _db.rpc(fn, params: params);
+    } on PostgrestException catch (e) {
+      final m = e.message;
+      if (m.contains('too many')) throw TooManyException();
+      if (m.contains('expired')) throw QrExpiredException();
+      if (m.contains('own qr')) throw OwnQrException();
+      if (m.contains('blocked')) throw Exception('No puedes conectar con esta persona.');
+      if (m.contains('group full')) throw Exception('Ese grupo ya está lleno (máximo 50).');
+      if (m.contains('not visible')) throw Exception('Activa Visible para saludar.');
+      rethrow;
+    }
+  }
+
   String get _uid {
     final id = userId;
     if (id == null) throw StateError('No hay sesión iniciada');
@@ -57,32 +73,25 @@ class SupabaseRepository implements AppRepository {
 
   @override
   Future<QrToken> createQrToken() async {
-    final res = await _db.rpc('create_qr_token');
+    final res = await _rpc('create_qr_token');
     final row = (res is List ? res.first : res) as Map<String, dynamic>;
     return QrToken(row['token'] as String, DateTime.parse(row['expires_at'] as String).toLocal());
   }
 
   @override
   Future<Profile> redeemQrToken(String token, {MeetPlace? place}) async {
-    try {
-      final res = await _db.rpc('redeem_qr_token', params: {
-        'p_token': token,
-        'p_place': place?.name ?? '',
-        'p_lat': place?.lat,
-        'p_lng': place?.lng,
-      });
-      return Profile.fromRow((res as Map).cast<String, dynamic>());
-    } on PostgrestException catch (e) {
-      if (e.message.contains('expired')) throw QrExpiredException();
-      if (e.message.contains('own')) throw OwnQrException();
-      if (e.message.contains('blocked')) throw Exception('No puedes conectar con esta persona.');
-      rethrow;
-    }
+    final res = await _rpc('redeem_qr_token', {
+      'p_token': token,
+      'p_place': place?.name ?? '',
+      'p_lat': place?.lat,
+      'p_lng': place?.lng,
+    });
+    return Profile.fromRow((res as Map).cast<String, dynamic>());
   }
 
   @override
   Future<List<Contact>> loadContacts() async {
-    final rows = await _db.rpc('my_contacts') as List;
+    final rows = await _rpc('my_contacts') as List;
     return rows.map((r) {
       final m = (r as Map).cast<String, dynamic>();
       return Contact(
@@ -101,23 +110,23 @@ class SupabaseRepository implements AppRepository {
 
   @override
   Future<void> setAccessRevoked(String contactUserId, bool revoked) async {
-    await _db.rpc('set_access_revoked', params: {'p_viewer': contactUserId, 'p_revoked': revoked});
+    await _rpc('set_access_revoked', {'p_viewer': contactUserId, 'p_revoked': revoked});
   }
 
   @override
   Future<void> saveNote(String contactUserId, String note) =>
-      _db.rpc('save_note', params: {'p_about': contactUserId, 'p_note': note});
+      _rpc('save_note', {'p_about': contactUserId, 'p_note': note});
 
   @override
   Future<void> saveSelfie(String contactUserId, String url) =>
-      _db.rpc('save_meet', params: {'p_other': contactUserId, 'p_selfie_url': url});
+      _rpc('save_meet', {'p_other': contactUserId, 'p_selfie_url': url});
 
   @override
   Future<void> savePlace(String contactUserId, String place) =>
-      _db.rpc('save_meet', params: {'p_other': contactUserId, 'p_place': place});
+      _rpc('save_meet', {'p_other': contactUserId, 'p_place': place});
 
   @override
-  Future<void> setVisible(MeetPlace? place) => _db.rpc('set_visible', params: {
+  Future<void> setVisible(MeetPlace? place) => _rpc('set_visible', {
         'p_place': place?.name ?? '',
         'p_lat': place?.lat,
         'p_lng': place?.lng,
@@ -126,7 +135,7 @@ class SupabaseRepository implements AppRepository {
   @override
   Future<List<NearbyPerson>> loadNearby(MeetPlace place) async {
     if (!place.hasCoords) return const [];
-    final rows = await _db.rpc('nearby', params: {'p_lat': place.lat, 'p_lng': place.lng}) as List;
+    final rows = await _rpc('nearby', {'p_lat': place.lat, 'p_lng': place.lng}) as List;
     return rows.map((r) {
       final m = (r as Map).cast<String, dynamic>();
       return NearbyPerson(
@@ -141,12 +150,50 @@ class SupabaseRepository implements AppRepository {
   }
 
   @override
-  Future<void> sendWave(String userId) => _db.rpc('send_wave', params: {'p_to': userId});
+  Future<void> sendWave(String userId) => _rpc('send_wave', {'p_to': userId});
 
   @override
-  Future<void> block(String userId) => _db.rpc('block_user', params: {'p_id': userId});
+  Future<void> block(String userId) => _rpc('block_user', {'p_id': userId});
 
   @override
   Future<void> report(String userId, String reason) =>
-      _db.rpc('report_user', params: {'p_id': userId, 'p_reason': reason});
+      _rpc('report_user', {'p_id': userId, 'p_reason': reason});
+
+  @override
+  Future<QrToken> createGroup({MeetPlace? place}) async {
+    final res = await _rpc('create_group', {'p_place': place?.name ?? '', 'p_lat': place?.lat, 'p_lng': place?.lng});
+    final row = (res is List ? res.first : res) as Map<String, dynamic>;
+    return QrToken(row['token'] as String, DateTime.parse(row['expires_at'] as String).toLocal(), group: true);
+  }
+
+  @override
+  Future<int> groupSize(String token) async => (await _rpc('group_size', {'p_token': token}) as num?)?.toInt() ?? 1;
+
+  @override
+  Future<void> endGroup(String token) => _rpc('end_group', {'p_token': token});
+
+  @override
+  Future<List<Profile>> joinGroup(String token, {MeetPlace? place}) async {
+    final res = await _rpc('join_group', {
+      'p_token': token,
+      'p_place': place?.name ?? '',
+      'p_lat': place?.lat,
+      'p_lng': place?.lng,
+    }) as List;
+    return [for (final r in res) Profile.fromRow((r as Map).cast<String, dynamic>())];
+  }
+
+  @override
+  Future<List<ActivityItem>> loadActivity(int afterId) async {
+    final rows = await _rpc('my_activity', {'p_after': afterId}) as List;
+    return [
+      for (final r in rows)
+        ActivityItem(
+          id: ((r as Map)['id'] as num).toInt(),
+          kind: r['kind'] as String,
+          actorId: r['actor_id'] as String,
+          firstName: r['first_name'] as String? ?? '',
+        ),
+    ];
+  }
 }

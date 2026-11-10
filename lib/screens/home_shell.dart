@@ -1,6 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../state/app_state.dart';
 
 import '../theme/polaroid.dart';
 import 'my_profile_screen.dart';
@@ -15,8 +18,41 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => HomeShellState();
 }
 
-class HomeShellState extends State<HomeShell> {
+class HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   int _tab = 0;
+  late final AppState _state;
+
+  @override
+  void initState() {
+    super.initState();
+    _state = context.read<AppState>();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _state.startActivity();
+      if (_state.me == null || _state.offline) _retry();
+    });
+  }
+
+  Future<void> _retry() => _state.loadAll().catchError((_) {});
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _state.stopActivity();
+    super.dispose();
+  }
+
+  /// Al volver a la app se revisan avisos y se recarga; al salir se deja de revisar.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState s) {
+    if (s == AppLifecycleState.resumed) {
+      _state.startActivity();
+      if (_state.me == null || _state.offline) _retry();
+    } else if (s == AppLifecycleState.paused) {
+      _state.stopActivity();
+    }
+  }
 
   void goTo(int tab) => setState(() => _tab = tab);
 
@@ -29,6 +65,30 @@ class HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+    if (state.me == null) {
+      // Sin internet la primera vez: no hay nada guardado todavía.
+      return Scaffold(
+        backgroundColor: Pal.bg,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: state.loading
+                ? const CircularProgressIndicator(color: Pal.yellow)
+                : Column(mainAxisSize: MainAxisSize.min, children: [
+                    const Text('📡', style: TextStyle(fontSize: 48)),
+                    const SizedBox(height: 12),
+                    Text('Sin conexión', style: display(22)),
+                    const SizedBox(height: 8),
+                    Text('Revisa tu internet para cargar tu perfil.',
+                        textAlign: TextAlign.center, style: body(15, color: Pal.muted)),
+                    const SizedBox(height: 20),
+                    BigButton('Reintentar', onTap: _retry),
+                  ]),
+          ),
+        ),
+      );
+    }
     final pages = [
       const MyProfileScreen(),
       ScannerScreen(active: _tab == 1),

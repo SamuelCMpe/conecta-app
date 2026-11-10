@@ -3,11 +3,17 @@ import '../models/profile.dart';
 class QrToken {
   final String token;
   final DateTime expiresAt;
-  const QrToken(this.token, this.expiresAt);
+
+  /// true si es un QR de grupo (todos los que lo escanean quedan conectados entre sí).
+  final bool group;
+  const QrToken(this.token, this.expiresAt, {this.group = false});
 
   /// Lo que va dentro del código QR.
-  String get payload => '$kQrPrefix$token';
+  String get payload => '$kQrPrefix${group ? kGroupPrefix : ''}$token';
 }
+
+/// Los QR de grupo llevan este prefijo dentro del token.
+const kGroupPrefix = 'g:';
 
 const kQrPrefix = 'qrconecta:';
 
@@ -22,6 +28,11 @@ String? tokenFromPayload(String raw) {
 class QrExpiredException implements Exception {
   @override
   String toString() => 'Este QR ya caducó. Pide que te muestren el código actualizado.';
+}
+
+class TooManyException implements Exception {
+  @override
+  String toString() => 'Vas muy rápido. Espera un rato e inténtalo de nuevo.';
 }
 
 class OwnQrException implements Exception {
@@ -81,4 +92,20 @@ abstract class AppRepository {
   Future<void> block(String userId);
 
   Future<void> report(String userId, String reason);
+
+  // ---------- Modo grupo ----------
+  /// Crea un QR de grupo que dura 3 horas.
+  Future<QrToken> createGroup({MeetPlace? place});
+
+  /// Cuántas personas hay en el grupo (contándote).
+  Future<int> groupSize(String token);
+
+  Future<void> endGroup(String token);
+
+  /// Te une al grupo: quedas conectado con todos. Devuelve a los demás.
+  Future<List<Profile>> joinGroup(String token, {MeetPlace? place});
+
+  // ---------- Avisos ----------
+  /// Avisos nuevos después de [afterId].
+  Future<List<ActivityItem>> loadActivity(int afterId);
 }

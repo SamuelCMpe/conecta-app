@@ -76,6 +76,25 @@ class _WallScreenState extends State<WallScreen> {
 
     return Stack(fit: StackFit.expand, children: [
       if (_map) WallMap(contacts: state.contacts) else WallBackground(wall: wall),
+      // Sobre el mapa, una franja oscura arriba para que el título se lea.
+      if (_map)
+        const Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 150,
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xF0141217), Color(0xB3141217), Color(0x00141217)],
+                ),
+              ),
+            ),
+          ),
+        ),
       SafeArea(
         child: Column(children: [
           Padding(
@@ -89,6 +108,11 @@ class _WallScreenState extends State<WallScreen> {
                   onChanged: (i) => setState(() => _map = i == 1)),
             ]),
           ),
+          if (state.offline)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 6),
+              child: Pill('📡 Sin conexión · mostrando lo guardado', bg: const Color(0xCC1E1B23), fg: Colors.white),
+            ),
           if (!_map)
             Expanded(
               child: RefreshIndicator(

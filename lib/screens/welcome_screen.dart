@@ -27,7 +27,7 @@ class WelcomeScreen extends StatelessWidget {
               constraints: BoxConstraints(minHeight: box.maxHeight),
               child: IntrinsicHeight(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  const SizedBox(height: 360, child: _Collage()),
+                  const SizedBox(height: 372, child: _Collage()),
                   const Spacer(),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
@@ -68,12 +68,12 @@ class _Collage extends StatelessWidget {
       final w = box.maxWidth;
       return Stack(clipBehavior: Clip.none, children: [
         Positioned(
-            left: w * 0.06, top: 30, child: const PersonPolaroid(id: 'maria', name: 'María', width: 150, angle: -10)),
+            left: w * 0.04, top: 18, child: const PersonPolaroid(id: 'maria', name: 'María', width: 140, angle: -10)),
         Positioned(
-            right: w * 0.06, top: 14, child: const PersonPolaroid(id: 'juan', name: 'Juan', width: 140, angle: 8)),
+            right: w * 0.04, top: 8, child: const PersonPolaroid(id: 'juan', name: 'Juan', width: 134, angle: 8)),
         Positioned(
           left: w / 2 - 80,
-          top: 150,
+          top: 168,
           child: const Polaroid(
             width: 160,
             angle: -2,
@@ -81,8 +81,8 @@ class _Collage extends StatelessWidget {
             photo: PhotoBox(url: 'assets/backgrounds/oceano.jpg', name: 'yo', id: 'yo'),
           ),
         ),
-        Positioned(left: w * 0.08, top: 250, child: const Sticker('📍 Barranco', angle: -8)),
-        Positioned(right: w * 0.07, top: 220, child: const Sticker('¡nos vemos! 🎉', color: 1, angle: 10)),
+        Positioned(left: w * 0.03, top: 286, child: const Sticker('📍 Barranco', angle: -8)),
+        Positioned(right: w * 0.03, top: 236, child: const Sticker('¡nos vemos! 🎉', color: 1, angle: 10)),
       ]);
     });
   }
