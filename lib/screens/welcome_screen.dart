@@ -32,7 +32,14 @@ class WelcomeScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(28, 12, 28, 24),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('conecta', style: display(40)),
+                      Row(children: [
+                        Transform.rotate(
+                          angle: -0.07,
+                          child: Image.asset('assets/logo/logo.png', width: 48, height: 48),
+                        ),
+                        const SizedBox(width: 12),
+                        Text('conecta', style: display(40)),
+                      ]),
                       const SizedBox(height: 10),
                       Text('Pasa tu QR, conoce gente y guarda el recuerdo de cada noche.',
                           style: body(19, color: const Color(0xFFE5E2EC), height: 1.35)),
@@ -101,6 +108,25 @@ class _LoginSheetState extends State<_LoginSheet> {
   bool _codeSent = false;
   bool _busy = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Si ya se mandó el enlace y la hoja se cerró sin querer, se vuelve a la pantalla de "Revisa tu correo".
+    final state = context.read<AppState>();
+    final pending = state.pendingLoginEmail;
+    if (pending != null && state.repo.usesEmailLink) {
+      _email.text = pending;
+      _codeSent = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _code.dispose();
+    super.dispose();
+  }
+
   Future<void> _run(Future<void> Function() f) async {
     setState(() => _busy = true);
     try {
@@ -153,7 +179,10 @@ class _LoginSheetState extends State<_LoginSheet> {
               onTap: _busy ? null : () => _run(() => state.repo.sendLoginCode(_email.text.trim())),
             ),
           TextButton(
-            onPressed: () => setState(() => _codeSent = false),
+            onPressed: () {
+              context.read<AppState>().pendingLoginEmail = null;
+              setState(() => _codeSent = false);
+            },
             child: Text('Usar otro correo', style: body(14, color: Pal.muted)),
           ),
         ]),
@@ -200,6 +229,7 @@ class _LoginSheetState extends State<_LoginSheet> {
                       final email = _email.text.trim();
                       if (!email.contains('@')) throw Exception('Escribe un correo válido.');
                       await state.repo.sendLoginCode(email);
+                      state.pendingLoginEmail = email;
                       setState(() => _codeSent = true);
                     } else {
                       await state.repo.verifyLoginCode(_email.text.trim(), _code.text.trim());

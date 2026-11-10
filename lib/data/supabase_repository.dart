@@ -42,8 +42,11 @@ class SupabaseRepository implements AppRepository {
   @override
   bool get usesEmailLink => true;
 
-  /// Adonde vuelve el enlace del correo (abre la app). Debe estar en Supabase > Authentication > URL Configuration.
-  static const loginRedirect = 'conecta://login-callback';
+  /// Adonde vuelve el enlace del correo. Es una página pequeña (docs/login en GitHub Pages)
+  /// que abre la app con conecta://login-callback; los navegadores no siempre abren
+  /// la app directo desde una redirección.
+  /// Debe estar en Supabase > Authentication > URL Configuration > Redirect URLs.
+  static const loginRedirect = 'https://samuelcmpe.github.io/conecta-app/login/';
 
   @override
   Future<void> sendLoginCode(String email) =>

@@ -32,6 +32,9 @@ class AppState extends ChangeNotifier {
   /// true si no hay internet y se muestra lo guardado en el celular.
   bool offline = false;
 
+  /// Correo al que se mandó el enlace para entrar (para no perderlo si se cierra la hoja).
+  String? pendingLoginEmail;
+
   /// "Cerca de ti": hasta cuándo estoy visible (null = apagado) y dónde.
   DateTime? visibleUntil;
   MeetPlace? visiblePlace;
@@ -48,6 +51,7 @@ class AppState extends ChangeNotifier {
       me = await repo.loadMyProfile();
       contacts = await repo.loadContacts();
       offline = false;
+      pendingLoginEmail = null;
       await _saveCache();
     } catch (e) {
       // Sin conexión: se muestra lo último guardado.

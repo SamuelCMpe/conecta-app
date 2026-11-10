@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar a Conecta</title>
+<style>
+  :root { --bg:#141217; --card:#1E1B23; --text:#F4F2F7; --muted:#A29DAD; --yellow:#FFD60A; --ink:#141217; --pink:#FF3D7F; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; background:var(--bg); color:var(--text);
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 24px 16px; }
+  main { width:100%; max-width:380px; display:grid; gap:18px; justify-items:center; text-align:center; }
+  img { width:96px; height:96px; transform: rotate(-4deg); }
+  h1 { margin:0; font-size:26px; }
+  p { margin:0; color:var(--muted); font-size:16px; line-height:1.45; }
+  a.btn { display:block; width:100%; padding:18px; border-radius:18px; background:var(--yellow); color:var(--ink);
+          font-weight:800; font-size:18px; text-decoration:none; }
+  .err { color:var(--pink); }
+</style>
+</head>
+<body>
+<main>
+  <img src="logo.png" alt="">
+  <h1 id="title">Abriendo Conecta…</h1>
+  <p id="msg">Si la app no se abre sola, toca el botón.</p>
+  <a class="btn" id="open" href="#">Abrir Conecta</a>
+</main>
+<script>
+  // Supabase manda aquí después de tocar el enlace del correo (?code=...).
+  // Esta página solo pasa ese código a la app: no guarda nada.
+  var search = location.search || '';
+  var hash = location.hash || '';
+  var params = new URLSearchParams(hash.replace(/^#/, ''));
+  var error = params.get('error_description') || new URLSearchParams(search).get('error_description');
+  var btn = document.getElementById('open');
+
+  if (error) {
+    document.getElementById('title').textContent = 'Este enlace ya no sirve';
+    var m = document.getElementById('msg');
+    m.textContent = 'Los enlaces duran poco y se usan una sola vez. Vuelve a la app y pide uno nuevo.';
+    m.className = 'err';
+    btn.textContent = 'Volver a Conecta';
+    search = ''; hash = '';
+  }
+
+  var deep = 'conecta://login-callback' + search + hash;
+  var isAndroid = /android/i.test(navigator.userAgent);
+  btn.href = isAndroid
+    ? 'intent://login-callback' + search + '#Intent;scheme=conecta;package=com.qrconecta.qr_conecta;end'
+    : deep;
+
+  if (!error) setTimeout(function () { location.href = deep; }, 300);
+</script>
+</body>
+</html>
