@@ -112,10 +112,54 @@ class _LoginSheetState extends State<_LoginSheet> {
     }
   }
 
+  bool _closing = false;
+
   @override
   Widget build(BuildContext context) {
-    final state = context.read<AppState>();
+    final state = context.watch<AppState>();
     final demo = state.repo.isDemo;
+    final link = state.repo.usesEmailLink;
+
+    // Al tocar el enlace del correo la sesión entra sola: se cierra esta hoja.
+    if (state.signedIn && state.me != null && !_closing) {
+      _closing = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.of(context).maybePop();
+      });
+    }
+
+    if (link && _codeSent) {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(24, 26, 24, 24 + MediaQuery.of(context).viewInsets.bottom),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const Text('📬', style: TextStyle(fontSize: 44)),
+          const SizedBox(height: 10),
+          Text('Revisa tu correo', style: display(22)),
+          const SizedBox(height: 8),
+          Text(
+            'Te enviamos un enlace a ${_email.text.trim()}. Ábrelo en este celular y toca "Sign in": la app se abre sola y ya entras.',
+            style: body(15, color: Pal.muted, height: 1.4),
+          ),
+          const SizedBox(height: 6),
+          Text('Si no llega en un minuto, mira en Spam o Promociones.', style: body(13, color: Pal.muted)),
+          const SizedBox(height: 20),
+          if (state.loading)
+            const Center(child: CircularProgressIndicator(color: Pal.yellow))
+          else
+            BigButton(
+              _busy ? 'Un momento…' : 'Reenviar enlace',
+              color: const Color(0x24FFFFFF),
+              textColor: Pal.text,
+              onTap: _busy ? null : () => _run(() => state.repo.sendLoginCode(_email.text.trim())),
+            ),
+          TextButton(
+            onPressed: () => setState(() => _codeSent = false),
+            child: Text('Usar otro correo', style: body(14, color: Pal.muted)),
+          ),
+        ]),
+      );
+    }
+
     return Padding(
       padding: EdgeInsets.fromLTRB(24, 26, 24, 24 + MediaQuery.of(context).viewInsets.bottom),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -127,7 +171,9 @@ class _LoginSheetState extends State<_LoginSheet> {
               ? 'Modo demo (sin servidor): escribe cualquier correo y cualquier código.'
               : _codeSent
                   ? 'Te enviamos un código de 6 dígitos a ${_email.text}.'
-                  : 'Te enviamos un código para entrar. Sin contraseñas.',
+                  : (link
+                      ? 'Te enviamos un enlace para entrar. Sin contraseñas.'
+                      : 'Te enviamos un código para entrar. Sin contraseñas.'),
           style: body(15, color: Pal.muted),
         ),
         const SizedBox(height: 18),
@@ -146,12 +192,14 @@ class _LoginSheetState extends State<_LoginSheet> {
           ),
         const SizedBox(height: 18),
         BigButton(
-          _busy ? 'Un momento…' : (_codeSent ? 'Entrar' : 'Enviar código'),
+          _busy ? 'Un momento…' : (_codeSent ? 'Entrar' : (link ? 'Enviar enlace' : 'Enviar código')),
           onTap: _busy
               ? null
               : () => _run(() async {
                     if (!_codeSent) {
-                      await state.repo.sendLoginCode(_email.text.trim());
+                      final email = _email.text.trim();
+                      if (!email.contains('@')) throw Exception('Escribe un correo válido.');
+                      await state.repo.sendLoginCode(email);
                       setState(() => _codeSent = true);
                     } else {
                       await state.repo.verifyLoginCode(_email.text.trim(), _code.text.trim());

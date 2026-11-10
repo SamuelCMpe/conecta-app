@@ -40,7 +40,14 @@ class SupabaseRepository implements AppRepository {
   }
 
   @override
-  Future<void> sendLoginCode(String email) => _db.auth.signInWithOtp(email: email, shouldCreateUser: true);
+  bool get usesEmailLink => true;
+
+  /// Adonde vuelve el enlace del correo (abre la app). Debe estar en Supabase > Authentication > URL Configuration.
+  static const loginRedirect = 'conecta://login-callback';
+
+  @override
+  Future<void> sendLoginCode(String email) =>
+      _db.auth.signInWithOtp(email: email, shouldCreateUser: true, emailRedirectTo: loginRedirect);
 
   @override
   Future<void> verifyLoginCode(String email, String code) async {

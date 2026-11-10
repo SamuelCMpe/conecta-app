@@ -27,6 +27,14 @@ Future<void> main() async {
     repo = DemoRepository();
   }
   final state = AppState(repo);
+  if (!repo.isDemo) {
+    // Al tocar el enlace del correo, la app se abre y la sesión llega por aquí.
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.signedIn && state.me == null) {
+        state.loadAll().catchError((_) {});
+      }
+    });
+  }
   try {
     await state.loadAll();
   } catch (e) {

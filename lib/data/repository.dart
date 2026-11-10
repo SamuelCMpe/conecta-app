@@ -48,6 +48,9 @@ abstract class AppRepository {
   bool get isSignedIn;
   String? get userId;
 
+  /// true si el correo trae un enlace para entrar (en vez de un código).
+  bool get usesEmailLink;
+
   Future<void> sendLoginCode(String email);
   Future<void> verifyLoginCode(String email, String code);
   Future<void> signOut();

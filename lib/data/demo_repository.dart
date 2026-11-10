@@ -75,6 +75,9 @@ class DemoRepository implements AppRepository {
   String? get userId => _signedIn ? _me.id : null;
 
   @override
+  bool get usesEmailLink => false;
+
+  @override
   Future<void> sendLoginCode(String email) async {}
 
   @override
